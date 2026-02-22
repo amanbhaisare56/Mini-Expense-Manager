@@ -148,6 +148,28 @@ date,amount,vendor,description
 
 ---
 
+## Design Note
+
+### Rule-based Categorization
+Vendor-to-category mapping is handled using a `VendorMap` collection in MongoDB.  
+When a new expense is added, the system checks if the vendor exists in the mapping:
+- If found → assigned mapped category  
+- If not found → defaults to **"Other"**
+
+### Anomaly Detection Logic
+An anomaly is detected when an expense amount exceeds **3× the average amount** of its category.  
+The average is calculated dynamically using MongoDB aggregation.
+
+### Data Model Choices
+Two collections are used:
+- `Expense` → stores transaction data with category & anomaly flag
+- `VendorMap` → stores vendor-category mappings
+
+### Trade-offs
+- Rule-based anomaly detection instead of ML
+- Manual vendor mapping
+- Sequential CSV processing
+
 ## ⚠️ Assumptions
 
 * Unknown vendors are categorized as **"Other"**
